@@ -135,7 +135,11 @@ _get_extras() {
 
   [[ -n "$SSH_CLIENT" ]]          && segs+=("%m")                 # хост (только ssh)
   [[ -n "$RVDSH_INSIDE_CHROOT" ]] && segs+=("chroot")
-  [[ -n "$WITH_SUBSHELL" ]]       && segs+=("subshell")
+  if [[ -n "$STY" ]]; then                                        # screen: имя сессии
+    local scname="${STY#*.}"; segs+=("${scname#.}")
+  elif [[ -n "$WITH_SUBSHELL" ]]; then                            # прочая подоболочка
+    segs+=("subshell")
+  fi
   [[ -n "$VIRTUAL_ENV" ]]         && segs+=("${VIRTUAL_ENV:t}")   # виртуальное окружение
   [[ -n "$CONDA_DEFAULT_ENV" ]]   && segs+=("${CONDA_DEFAULT_ENV}")
   vcs_info
