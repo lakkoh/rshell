@@ -1,0 +1,13 @@
+# ~/.zshrc — установлено rshell
+# Переносимая конфигурация и загрузчик плагинов: @RSHELL_DIR@/zshrc
+
+source "@RSHELL_DIR@/zshrc"
+
+# ── PLUGINS (порядок важен) ──────────────────────────────────
+# zsh-syntax-highlighting должен подключаться последним.
+ZSH_AUTOSUGGEST_STRATEGY=(history)
+plugin-load zsh-users/zsh-autosuggestions
+plugin-load zsh-users/zsh-syntax-highlighting
+
+# ── HOST-SPECIFIC ────────────────────────────────────────────
+# Локальные для этой машины настройки (пути, секреты и т.п.).

@@ -1,0 +1,14 @@
+rshell — NOTICE
+===============
+
+Проект распространяется под лицензией MIT (см. LICENSE).
+
+
+Скопированный сторонний код
+---------------------------
+
+1. zsh_unplugged — https://github.com/mattmc3/zsh_unplugged
+   Автор:    Matt Coleman (mattmc3)
+   Лицензия: The Unlicense (выведено в общественное достояние)
+   Где:      функция `plugin-load` в `zshrc` (раздел [6] PLUGIN MANAGER),
+             встроена без изменений.
