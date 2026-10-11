@@ -82,8 +82,10 @@ zstyle ':completion:*' cache-path "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompcach
 
 # ── [5] PROMPT ───────────────────────────────────────────────
 
-# Цвета (по умолчанию без окраски части сегментов — настройте под себя).
+# Цвета (по умолчанию — настройте под себя).
 typeset -g C_RESET="%f"
+typeset -g C_USER="%f"
+typeset -g C_ROOT="%f"
 typeset -g C_RARROWS="%F{green}"
 typeset -g C_LARROWS="%F{yellow}"
 typeset -g C_OPERATOR="%F{cyan}"
@@ -95,49 +97,54 @@ zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git:*' formats '%b'
 
 # Определяем контейнер/chroot один раз при старте, без форков на каждый промпт.
-typeset -g RVDSH_INSIDE_CHROOT=0
+# Переменная ПУСТА вне контейнера (проверки ниже используют -n).
+typeset -g RVDSH_INSIDE_CHROOT=
 if grep -qaE '/(docker|lxc|chroot)' /proc/1/environ 2>/dev/null; then
   RVDSH_INSIDE_CHROOT=1
 fi
 
-# Код возврата и признак подоболочки — обновляются перед каждым промптом.
+# Код возврата и признаки контекста — обновляются перед каждым промптом.
 _get_env() {
   typeset -g LASTEXITCODE=$?
-  typeset -g WITH_SUBSHELL=0
+  typeset -g WITH_SUBSHELL=
   if [[ "$ZSH_SUBSHELL" -gt 0 || "$SHLVL" -gt 1 ]]; then
     WITH_SUBSHELL=1
   fi
 }
 
-# Открывающий знак.
+# Стрелка: результат последней команды и контекст (ssh/sudo, root).
 _get_arrow() {
   if [[ $LASTEXITCODE -eq 127 ]]; then                 # команда не найдена
     echo "${C_ERROR}?${C_RESET}"
   elif [[ $LASTEXITCODE -ne 0 ]]; then                 # ошибка выполнения
-    echo "${C_ERROR}$LASTEXITCODE!${C_RESET}"
-  elif [[ -n "$SSH_CLIENT" || -n "$RVDSH_INSIDE_CHROOT" ||
-          -n "$WITH_SUBSHELL" || -n "$SUDO_USER" ]]; then
-    [[ $EUID -eq 0 ]] && echo "${C_LARROWS}<<${C_RESET}" || echo "${C_LARROWS}<${C_RESET}"
+    echo "${C_ERROR}${LASTEXITCODE}!${C_RESET}"
   else
-    [[ $EUID -eq 0 ]] && echo "${C_RARROWS}>>${C_RESET}" || echo "${C_RARROWS}>${C_RESET}"
+    local special=
+    [[ -n "$SSH_CLIENT" || -n "$SUDO_USER" ]] && special=1
+    if [[ $EUID -eq 0 ]]; then
+      [[ -n "$special" ]] && echo "${C_LARROWS}<<${C_RESET}" || echo "${C_RARROWS}>>${C_RESET}"
+    else
+      [[ -n "$special" ]] && echo "${C_LARROWS}<${C_RESET}" || echo "${C_RARROWS}>${C_RESET}"
+    fi
   fi
 }
 
-# Дополнительные сегменты (use / with / on).
+# Сегменты (объявления через " | "): host, chroot, subshell, venv/conda, ветка.
 _get_extras() {
-  local extras=""
+  local seg segs=() out=""
 
-  [[ -n "$VIRTUAL_ENV" ]] && extras+=("${C_OPERATOR}use${C_RESET} ${C_OPERAND}${VIRTUAL_ENV:t}${C_RESET}")
-  [[ -n "$CONDA_DEFAULT_ENV" ]] && extras+=("${C_OPERATOR}use${C_RESET} ${C_OPERAND}${CONDA_DEFAULT_ENV}${C_RESET}")
-
-  [[ -n "$RVDSH_INSIDE_CHROOT" ]] && extras+=("${C_OPERATOR}with${C_RESET} ${C_OPERAND}chroot${C_RESET}")
-  [[ -n "$WITH_SUBSHELL" ]] && extras+=("${C_OPERATOR}with${C_RESET} ${C_OPERAND}subshell${C_RESET}")
-  [[ -n "$SSH_CLIENT" ]] && extras+=("${C_OPERATOR}with${C_RESET} ${C_OPERAND}ssh${C_RESET}")
-
+  [[ -n "$SSH_CLIENT" ]]          && segs+=("%m")                 # хост (только ssh)
+  [[ -n "$RVDSH_INSIDE_CHROOT" ]] && segs+=("chroot")
+  [[ -n "$WITH_SUBSHELL" ]]       && segs+=("subshell")
+  [[ -n "$VIRTUAL_ENV" ]]         && segs+=("${VIRTUAL_ENV:t}")   # виртуальное окружение
+  [[ -n "$CONDA_DEFAULT_ENV" ]]   && segs+=("${CONDA_DEFAULT_ENV}")
   vcs_info
-  [[ -n "$vcs_info_msg_0_" ]] && extras+=("${C_OPERATOR}on${C_RESET} ${C_OPERAND}${vcs_info_msg_0_}${C_RESET}")
+  [[ -n "$vcs_info_msg_0_" ]]     && segs+=("${vcs_info_msg_0_}") # ветка
 
-  echo "${(j: :)extras}"
+  for seg in "${segs[@]}"; do
+    out+=" ${C_OPERATOR}|${C_RESET} ${C_OPERAND}${seg}${C_RESET}"
+  done
+  [[ -n "$out" ]] && echo "$out"
 }
 
 _get_prompt() {

@@ -80,11 +80,23 @@ git clone <url> "${XDG_DATA_HOME:-$HOME/.local/share}/rshell"
 - Настройки **конкретной машины** — в `~/.zshrc` (секция `HOST-SPECIFIC`):
   пути, секреты, специфичные для хоста переменные.
 
-Промпт задаётся функцией `_get_prompt` в `zshrc` и использует цвета
-`C_RESET`, `C_RARROWS`, `C_LARROWS`, `C_OPERATOR`, `C_OPERAND`, `C_ERROR` —
-переопределите их в `~/.zshrc` после строки `source`. Промпт показывает код
-возврата последней команды и признаки контекста (`ssh`, `chroot`, `subshell`,
-`use <venv/conda>`, `on <git-ветка>`).
+Промпт задаётся функцией `_get_prompt` в `zshrc`. Левая часть — имя
+пользователя, далее объявления через разделитель `|` (host, `chroot`,
+`subshell`, имя venv/conda, git-ветка) и стрелка:
+
+```
+r >
+r | main >
+r | subshell >
+r | venv >
+r | centaurea | main <
+```
+
+Стрелка отражает результат последней команды и контекст: `?` — команда не
+найдена, `<код>!` — ошибка, `<`/`<<` — ssh или sudo, `>`/`>>` — обычный случай
+(удвоение — у root). Цвета `C_RESET`, `C_USER`, `C_ROOT`, `C_RARROWS`,
+`C_LARROWS`, `C_OPERATOR`, `C_OPERAND`, `C_ERROR` можно переопределить в
+`~/.zshrc` после строки `source`.
 
 ## Плагины
 
