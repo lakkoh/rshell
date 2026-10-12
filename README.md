@@ -85,11 +85,11 @@ git clone <url> "${XDG_DATA_HOME:-$HOME/.local/share}/rshell"
 screen-сессии или `subshell`, имя venv/conda, git-ветка) и стрелка:
 
 ```
-r >
-r | main >
-r | subshell >
-r | venv >
-r | centaurea | main <
+user >
+user | main >
+user | subshell >
+user | venv >
+user | host | main <
 ```
 
 Стрелка отражает результат последней команды и контекст: `?` — команда не
