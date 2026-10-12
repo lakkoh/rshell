@@ -13,6 +13,7 @@
 #    [4] COMPLETION      — дополнения (compinit)
 #    [5] PROMPT          — приглашение
 #    [6] PLUGIN MANAGER  — мини-загрузчик плагинов (zsh_unplugged)
+#    [7] ALIAS           ─ алиасы
 #
 #  Плагины НЕ объявляются здесь: их список и порядок задаются в ~/.zshrc
 #  хост-файле (см. zshrc.template).
@@ -205,3 +206,62 @@ function plugin-load {
     (( $+functions[zsh-defer] )) && zsh-defer . $initfile || . $initfile
   done
 }
+
+# ── [7] ALIAS ────────────────────────────────────────────────
+
+# ── ls ───────────────────────────────────────────────────────
+alias ls="ls --color=auto"
+alias la="ls -lA"
+alias ll="ls -l"
+alias ld="ls -l | grep '^d'"            # только директории
+alias lt="ls -ltr"                      # сортировка по времени
+alias lS="ls -lS"                       # сортировка по размеру
+alias l.="ls -d .*"                     # только скрытые
+alias tree="tree -C"                    # цветное дерево
+# ── files ─────────────────────────────────────────────────────
+alias du="du -h"
+alias df="df -h"
+alias dus="du -sh * | sort -h"          # топ по размеру
+alias cd..="cd .."
+alias cd...="cd ../.."
+alias cd....="cd ../../.."
+alias cd-="cd -"
+# ── security ──────────────────────────────────────────────────
+alias rm="rm -I --preserve-root"
+alias chown="chown --preserve-root"
+alias chmod="chmod --preserve-root"
+alias chgrp="chgrp --preserve-root"
+# ── search ────────────────────────────────────────────────────
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+alias pg="ps aux | grep -i --color=auto"
+alias rg='rg --smart-case'
+# ── git ───────────────────────────────────────────────────────
+alias g="git"
+alias gs="git status -sb"
+alias ga="git add"
+alias gaa="git add -A"
+alias gc="git commit -m"
+alias gca="git commit --amend"
+alias gco="git checkout"
+alias gcb="git checkout -b"
+alias gd="git diff"
+alias gds="git diff --staged"
+alias gl="git log --oneline --graph --decorate"
+alias gla="git log --oneline --graph --decorate --all"
+alias gp="git push"
+alias gpf="git push --force-with-lease"
+alias gpl="git pull"
+alias gf="git fetch --prune"
+alias gst="git stash"
+alias gstp="git stash pop"
+alias grb="git rebase"
+alias gcl="git clone"
+# ── sudo ──────────────────────────────────────────────────────
+alias sudo="sudo "                    # позволяет sudo с алиасами
+alias please="sudo !!"
+# ── shell ─────────────────────────────────────────────────────
+alias c="clear"
+alias e="exit"
+alias q="exit"
