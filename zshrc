@@ -260,7 +260,6 @@ alias grb="git rebase"
 alias gcl="git clone"
 # ── sudo ──────────────────────────────────────────────────────
 alias sudo="sudo "                    # позволяет sudo с алиасами
-alias please="sudo !!"
 # ── shell ─────────────────────────────────────────────────────
 alias c="clear"
 alias e="exit"
